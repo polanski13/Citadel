@@ -178,7 +178,7 @@ final class CitadelServerDelegate: Sendable, GlobalRequestDelegate {
                     context: SSHContext(username: username)
                 )
             }
-        case .forwardedTCPIP:
+        case .forwardedTCPIP, .directStreamLocal:
             return channel.eventLoop.makeFailedFuture(CitadelError.unsupported)
         }
     }

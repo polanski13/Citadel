@@ -44,7 +44,7 @@ final class SSHClientInboundChannelHandler: Sendable {
         switch channelType {
         case .session:
             return channel.eventLoop.makeFailedFuture(CitadelError.unsupported)
-        case .directTCPIP:
+        case .directTCPIP, .directStreamLocal:
             return channel.eventLoop.makeFailedFuture(CitadelError.unsupported)
         case .forwardedTCPIP(let forwardedTCPIP):
             return forwardedTCPIPHosts.withLockedValue { hosts in
