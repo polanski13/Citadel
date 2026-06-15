@@ -81,6 +81,23 @@ public struct TTYStdinWriter {
         try await channel.writeAndFlush(SSHChannelData(type: .channel, data: .byteBuffer(buffer)))
     }
 
+    /// Best-effort write for latency-sensitive interactive input.
+    ///
+    /// This intentionally skips the returned future and promise allocation;
+    /// callers must use `write(_:)` when they need backpressure-sensitive
+    /// completion semantics.
+    ///
+    /// - Returns: `true` when the bytes were queued on a writable channel,
+    ///   otherwise `false` so callers can fall back to `write(_:)`.
+    public func writeBestEffort(_ buffer: ByteBuffer) -> Bool {
+        guard channel.isWritable else { return false }
+        channel.writeAndFlush(
+            SSHChannelData(type: .channel, data: .byteBuffer(buffer)),
+            promise: nil
+        )
+        return true
+    }
+
     public func changeSize(cols: Int, rows: Int, pixelWidth:Int, pixelHeight:Int) async throws {
         try await channel.triggerUserOutboundEvent(
             SSHChannelRequestEvent.WindowChangeRequest(
